@@ -1,0 +1,24 @@
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.footer__copyright {
+  font-size: 16px;
+  color: #b6bcbf;
+}
+
+.footer__menu {
+  display: flex;
+}
+
+.footer__navigation-item {
+  margin-right: 50px;
+  text-decoration: none;
+  color: #1a1b22;
+}
+
+.footer__social-icon {
+  margin-right: 26px;
+}

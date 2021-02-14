@@ -4,11 +4,11 @@ import NewsCard from '../NewsCard/NewsCard';
 
 import './NewsCardList.css';
 
-function NewsCardList({ newsList }) {
+function NewsCardList({ newsList, className = '', saved = false }) {
   return (
-    <div className="news-card-list">
-      {newsList.map((newsCard) => (
-        <NewsCard key={newsCard.id} newsCard={newsCard} />
+    <div className={`news-card-list ${className}`}>
+      {newsList.map((newsCard, index) => (
+        <NewsCard key={index} newsCard={newsCard} saved={false} />
       ))}
     </div>
   );

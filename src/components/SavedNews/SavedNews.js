@@ -1,12 +1,16 @@
 import React from 'react';
 
 import SavedHeader from '../SavedHeader/SavedHeader';
+import SavedNewsContent from '../SavedNewsContent/SavedNewsContent';
 
 import './SavedNews.css';
 
-function SavedNews() {
+function SavedNews({ handleClick }) {
   return (
-    <SavedHeader />
+    <>
+      <SavedHeader handleClick={handleClick} />
+      <SavedNewsContent />
+    </>
   );
 }
 

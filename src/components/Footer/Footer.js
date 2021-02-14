@@ -17,11 +17,11 @@ function Footer() {
       <div className='footer__menu'>
         <nav className='footer__navigation'>
           <Link to='/' className='footer__navigation-item' >Главная</Link>
-          <a href='https://praktikum.yandex.ru' className='footer__navigation-item'>Яндекс Практикум</a>
+          <a rel="noreferrer" target="_blank" href='https://praktikum.yandex.ru' className='footer__navigation-item'>Яндекс Практикум</a>
         </nav>
         <div className='footer__social-container'>
-          <a href='https://github.com' className='footer__social-icon'><img src={githubIcon} alt='github' /></a>
-          <a href='https://facebook.com' className='footer__social-icon'><img src={facebookIcon} alt='github' /></a>
+          <a rel="noreferrer" target="_blank" href='https://github.com' className='footer__social-icon'><img src={githubIcon} alt='github' /></a>
+          <a rel="noreferrer" target="_blank" href='https://facebook.com' className='footer__social-icon'><img src={facebookIcon} alt='github' /></a>
         </div>
       </div>
     </footer>

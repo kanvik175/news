@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { Route, Switch } from 'react-router-dom';
 
@@ -13,13 +13,33 @@ import MainApi from '../../utils/MainApi';
 
 import './App.css';
 
+const mainApi = new MainApi();
+
 function App() {
   const [registrationPopupIsOpen, setRegistrationPopupIsOpen] = useState(false);
   const [loginPopupIsOpen, setLoginPopupIsOpen] = useState(false);
   const [infoPopupIsOpen, setInfoPopupIsOpen] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState('');
+  const [registrationErrorText, setRegistrationErrorText] = useState('');
+  const [loginErrorText, setLoginErrorText] = useState('');
+
+  const [currentUser, setCurrentUser] = useState();
+
+  const getUserInfo = useCallback(async () => {
+    const userInfo = await mainApi.getInfo();
+    setCurrentUser(userInfo)
+  }, [setCurrentUser]);
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      (async () => await getUserInfo())();
+    }
+  }, [getUserInfo])
+
+  function handleSignOut() {
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+  }
 
   function closeRegistrationPopup() {
     setRegistrationPopupIsOpen(false);
@@ -46,29 +66,56 @@ function App() {
   }
 
   async function handleRegistrationPopupButtonClick(values) {
-    const mainApi = new MainApi();
     try {
-      const response = await mainApi.signup(
-        values.email,
-        values.password,
-        values.name,
-      );
-      console.log(response);
+      await mainApi.signup(values.email, values.password, values.name);
       closeRegistrationPopup();
       openInfoPopup();
     } catch (error) {
       console.log(error.message);
+      const errorMessage =
+        error.message === '400'
+          ? 'Данные заполнены неверно'
+          : 'Ошибка регистрации';
+      console.log(errorMessage);
+      setRegistrationErrorText(errorMessage);
     }
   }
+
+  const clearRegistrationErrorText = useCallback(() => {
+    setRegistrationErrorText('');
+  }, []);
 
   function handleRegistrationPopupLinkClick() {
     closeRegistrationPopup();
     openLoginPopup();
   }
+  
 
-  function handleLoginPopupButtonClick() {
-    closeLoginPopup();
+  async function handleLoginPopupButtonClick(values) {
+    try {
+      const response = await mainApi.signin(values.email, values.password);
+      localStorage.setItem('token', response.jwt);
+      await getUserInfo();
+      closeLoginPopup();
+    } catch (error) {
+      let errorMessage = '';
+      switch (error.message) {
+        case '400':
+          errorMessage = 'Данные заполнены неверно';
+          break;
+        case '404':
+          errorMessage = 'Пользователя не существует';
+          break;
+        default:
+          errorMessage = 'Ошибка авторизации';
+      }
+      setLoginErrorText(errorMessage);
+    }
   }
+
+  const clearLoginErrorText = () => {
+    setLoginErrorText('');
+  };
 
   function handleLoginPopupLinkClick() {
     closeLoginPopup();
@@ -85,10 +132,10 @@ function App() {
       <CurrentUserContext.Provider value={currentUser}>
         <Switch>
           <Route path="/saved-news">
-            <SavedNews handleClick={openRegistrationPopup} />
+            <SavedNews handleSignOut={handleSignOut} handleSignUp={openRegistrationPopup} />
           </Route>
           <Route path="/">
-            <Main handleClick={openRegistrationPopup} />
+            <Main handleSignUp={openRegistrationPopup} handleSignOut={handleSignOut} />
           </Route>
         </Switch>
       </CurrentUserContext.Provider>
@@ -98,12 +145,16 @@ function App() {
         handleClose={closeRegistrationPopup}
         handleButtonClick={handleRegistrationPopupButtonClick}
         handleLinkClick={handleRegistrationPopupLinkClick}
+        errorText={registrationErrorText}
+        clearErrorText={clearRegistrationErrorText}
       />
       <LoginPopup
         isOpen={loginPopupIsOpen}
         handleClose={closeLoginPopup}
         handleButtonClick={handleLoginPopupButtonClick}
         handleLinkClick={handleLoginPopupLinkClick}
+        errorText={loginErrorText}
+        clearErrorText={clearLoginErrorText}
       />
       <InfoPopup
         isOpen={infoPopupIsOpen}

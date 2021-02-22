@@ -1,18 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import PopupWithForm from '../PopupWithForm/PopupWithForm';
 import Button from '../Button/Button';
 import useForm from '../../hooks/useForm';
 
-function RegistrationPopup({ handleButtonClick, handleLinkClick, ...props }) {
-  const [values, errors, formIsValid, handleChange, resetForm] = useForm();
+function RegistrationPopup({
+  handleButtonClick,
+  handleLinkClick,
+  errorText,
+  clearErrorText,
+  ...props
+}) {
+  const [values, errors, formIsValid, handleChangeInput, resetForm] = useForm();
 
-  const [formTextError, setFormTextError] = useState('');
+  useEffect(() => {
+    if (errorText && !props.isOpen) {
+      clearErrorText();
+    }
+    resetForm();
+  }, [props.isOpen, clearErrorText, resetForm, errorText]);
 
   function handleSubmit(event) {
     event.preventDefault();
     handleButtonClick(values);
     resetForm();
+  }
+
+  function handleChange(event) {
+    clearErrorText();
+    handleChangeInput(event);
   }
 
   return (
@@ -87,10 +103,10 @@ function RegistrationPopup({ handleButtonClick, handleLinkClick, ...props }) {
         </p>
         <p
           className={`popup__error ${
-            formTextError ? 'popup__error_show' : ''
+            errorText ? 'popup__error_show' : ''
           } popup__error_general`}
         >
-          {formTextError}
+          {errorText}
         </p>
         <div className="popup__footer">
           <Button

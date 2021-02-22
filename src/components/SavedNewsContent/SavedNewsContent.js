@@ -5,11 +5,11 @@ import { savedNewsList } from '../../consts/newsList';
 
 import './SavedNewsContent.css';
 
-function SavedNewsContent() {
+function SavedNewsContent({ articles }) {
   return (
     <div className="saved-news-content">
       <div className="side-padding">
-        <NewsCardList newsList={savedNewsList} saved />
+        <NewsCardList newsList={articles} saved />
       </div>
     </div>
   );

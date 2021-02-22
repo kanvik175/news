@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 function useForm() {
   const [values, setValues] = useState({});
@@ -15,11 +15,11 @@ function useForm() {
     setFormIsValid(inputElement.closest('form').checkValidity());
   }
 
-  function resetForm() {
+  const resetForm = useCallback(() => {
     setValues({});
     setErrors({});
     setFormIsValid(false);
-  }
+  }, []);
 
   return [values, errors, formIsValid, handleChange, resetForm];
 }

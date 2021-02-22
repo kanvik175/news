@@ -10,30 +10,39 @@ import NewsApi from '../../utils/NewsApi';
 
 import './Main.css';
 
-function Main({ handleClick }) {
+function Main({ handleSignUp, handleSignOut }) {
   const [isLoading, setIsLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [isError, setIsError] = useState(false);
 
   const [articles, setArticles] = useState([]);
   const [articlesCount, setArticlesCount] = useState(3);
+  const [keyword, setKeyword] = useState('');
 
   const [showButton, setShowButton] = useState(true);
 
   useEffect(() => {
     const localArticles = localStorage.getItem('articles');
     if (localArticles) {
-      setArticles(JSON.parse(localArticles));
+      const localArticlesObj = JSON.parse(localArticles);
+      setArticles(localArticlesObj.articles);
+      setKeyword(localArticlesObj.keyword)
     }
   }, []);
 
   async function handleSearch(searchQuery) {
     setIsLoading(true);
+    setNotFound(false);
+    setShowButton(true);
     let response;
     try {
       response = await new NewsApi().search(searchQuery);
       setArticles(response.articles);
-      localStorage.setItem('articles', JSON.stringify(response.articles));
+      setKeyword(searchQuery);
+      localStorage.setItem('articles', JSON.stringify({
+        keyword: searchQuery,
+        articles: response.articles
+      }));
       setArticlesCount(3);
       if (!response.articles.length) {
         setNotFound(true);
@@ -60,7 +69,7 @@ function Main({ handleClick }) {
 
   return (
     <>
-      <MainHeader handleClick={handleClick} handleSearch={handleSearch} />
+      <MainHeader handleSignUp={handleSignUp} handleSignOut={handleSignOut} handleSearch={handleSearch} />
       {isLoading ? (
         <Preloader />
       ) : notFound ? (
@@ -72,6 +81,7 @@ function Main({ handleClick }) {
           handleMoreButtonClick={increaseArticlesCount}
           articles={visibleArticles}
           showButton={showButton}
+          keyword={keyword}
         />
       ) : (
         ''

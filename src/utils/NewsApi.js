@@ -5,7 +5,7 @@ class NewsApi {
     this.apiKey = 'a41ec8562a4343f79688c9c6983068da';
     this.from = DateUtil.getPastDate(7);
     this.to = DateUtil.digitFormatDate();
-    this.pageSize = 5;
+    this.pageSize = 100;
     this.baseUrl = 'https://newsapi.org/v2/everything';
   }
 

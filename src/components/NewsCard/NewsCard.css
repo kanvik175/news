@@ -37,6 +37,7 @@
   padding: 8px 12px;
   display: flex;
   visibility: hidden;
+  text-transform: capitalize;
 }
 
 .news-card__tag_show {
@@ -94,9 +95,13 @@
   padding: 0 10px;
   align-items: center;
   margin-right: 5px;
-  display: flex;
+  display: none;
   opacity: 0;
   transition: opacity 0.5s;
+}
+
+.news-card__button-tooltip_show {
+  display: flex;
 }
 
 .news-card__button:hover + .news-card__button-tooltip {

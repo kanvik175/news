@@ -1,36 +1,65 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 
 import DateUtil from '../../utils/DateUtil';
+import CurrentUserContext from '../../contexts/CurrentUserContext';
 
 import './NewsCard.css';
 
-function NewsCard({ newsCard, saved }) {
-  const handleClick = (event) => {
+function NewsCard({ newsCard, saved, handleClick, keyword }) {
+  const [clicked, setClicked] = useState(false);
+  const currentUser = useContext(CurrentUserContext);
+
+  const handleCardClick = (event) => {
     if (!event.target.matches('.news-card__button')) {
       const url = event.currentTarget.dataset.url;
       window.open(url, '_blank');
     }
   };
 
+  const dataToSave = {
+    keyword: keyword,
+    title: newsCard.title,
+    text: newsCard.description,
+    date: newsCard.publishedAt,
+    source: newsCard.source.name,
+    link: newsCard.url,
+    image: newsCard.urlToImage,
+  };
+
+  const handleButtonClick = async () => {
+    if (currentUser && (await handleClick(dataToSave))) {
+      setClicked(true);
+    }
+  };
+
   return (
-    <div onClick={handleClick} data-url={newsCard.url} className="news-card">
+    <div
+      onClick={handleCardClick}
+      data-url={newsCard.url}
+      className="news-card"
+    >
       <div className="news-card__image-container">
         <img className="news-card__image" src={newsCard.urlToImage} alt="pix" />
         <div className="news-card__button-wrapper">
           <div
             className={`news-card__tag ${saved ? 'news-card__tag_show' : ''}`}
           >
-            {newsCard.tag}
+            {newsCard.keyword ? newsCard.keyword : ''}
           </div>
           <div className="news-card__image-actions">
             <button
+              onClick={handleButtonClick}
               className={`news-card__button ${
                 saved
                   ? 'news-card__button_type_trash'
                   : 'news-card__button_type_bookmark'
-              } ${newsCard.saved ? 'news-card__button_checked' : ''}`}
+              } ${clicked ? 'news-card__button_checked' : ''}`}
             ></button>
-            <div className="news-card__button-tooltip news-card__button-tooltip_type_bookmark">
+            <div
+              className={`news-card__button-tooltip ${
+                !currentUser ? 'news-card__button-tooltip_show' : ''
+              } news-card__button-tooltip_type_bookmark`}
+            >
               {saved
                 ? 'Убрать из сохраненных'
                 : 'Войдите, чтобы сохранять статьи'}
